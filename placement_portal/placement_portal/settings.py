@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'jobs',
     'applications',
     'rest_framework',
+    'rest_framework_simplejwt',  # JWT authentication package
 ]
 
 MIDDLEWARE = [
@@ -119,4 +120,55 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = 'static/'
+
+# ---------------------------------------------------------------
+# MEDIA FILES — for storing uploaded resumes
+# MEDIA_ROOT = the actual folder on disk where files are saved
+# MEDIA_URL  = the URL prefix used to access those files
+# ---------------------------------------------------------------
+import os
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+# ---------------------------------------------------------------
+# AUTH_USER_MODEL — tells Django to use our custom User model
+# ---------------------------------------------------------------
 AUTH_USER_MODEL = 'users.User'
+
+# ---------------------------------------------------------------
+# REST FRAMEWORK — global DRF settings
+#
+# DEFAULT_AUTHENTICATION_CLASSES:
+#   JWTAuthentication → every request must carry a valid JWT token
+#   (unless the view explicitly allows unauthenticated access)
+#
+# DEFAULT_PERMISSION_CLASSES:
+#   IsAuthenticated → by default, you must be logged in
+#   Individual views can override this (e.g., AllowAny for login)
+# ---------------------------------------------------------------
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    ),
+}
+
+# ---------------------------------------------------------------
+# SIMPLE_JWT — settings for token lifetimes
+#
+# ACCESS_TOKEN_LIFETIME  : how long the access token is valid
+#                          (short = more secure, user must refresh often)
+# REFRESH_TOKEN_LIFETIME : how long refresh token is valid
+#                          (longer = user stays logged in)
+# ROTATE_REFRESH_TOKENS  : when True, using a refresh token gives
+#                          you a brand new refresh token (more secure)
+# ---------------------------------------------------------------
+from datetime import timedelta
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
+    'ROTATE_REFRESH_TOKENS': True,
+    'AUTH_HEADER_TYPES': ('Bearer',),
+}

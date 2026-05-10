@@ -1,5 +1,7 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 
 class User(AbstractUser):
@@ -25,9 +27,8 @@ class CompanyProfile(models.Model):
     company_name = models.CharField(max_length=255)
     description = models.TextField(blank=True)
 
-
-from django.db.models.signals import post_save
-from django.dispatch import receiver
+    def __str__(self):
+        return self.company_name
 
 
 @receiver(post_save, sender=User)
@@ -37,6 +38,3 @@ def create_user_profile(sender, instance, created, **kwargs):
             StudentProfile.objects.create(user=instance)
         elif instance.role == "company":
             CompanyProfile.objects.create(user=instance)
-
-    def __str__(self):
-        return self.company_name
